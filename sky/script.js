@@ -12,7 +12,7 @@ function drawSkyBackground() {
     const rectWidth = 850;
     const numberOfRectangles = Math.ceil(600 / rectHeight);
 
-    // Define softened color stops for a harmonious gradient
+    // Define softened color stops for a harmonious gradient, including blue-green colors in the lower part
     const colors = [
         { r: 160, g: 200, b: 220 },  // Light sky blue at the top
         { r: 180, g: 220, b: 170 },  // Light greenish color
@@ -41,9 +41,6 @@ function drawSkyBackground() {
 
         addTexture(rect, r, g, b, rectWidth, rectHeight, 0.1);
     }
-
-    // Add oil painting noise
-    addOilPaintEffect();
 }
 
 // Function to create a rectangle
@@ -69,44 +66,32 @@ function addTexture(baseRect, r, g, b, rectWidth, rectHeight, opacity) {
                                     ${Math.min(255, Math.max(0, g + colorVariation))}, 
                                     ${Math.min(255, Math.max(0, b + colorVariation))}, ${opacity})`;
 
-        let textureRect = createRect(
-            parseFloat(baseRect.getAttribute("x")) + offsetX,
-            parseFloat(baseRect.getAttribute("y")) + offsetY,
-            rectWidth * 0.9,
-            rectHeight * 0.9,
-            r,
-            g,
-            b
-        );
+        let textureRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        textureRect.setAttribute("x", parseFloat(baseRect.getAttribute("x")) + offsetX);
+        textureRect.setAttribute("y", parseFloat(baseRect.getAttribute("y")) + offsetY);
+        textureRect.setAttribute("width", rectWidth * 0.9);
+        textureRect.setAttribute("height", rectHeight * 0.9);
         textureRect.setAttribute("fill", textureColor);
+
         svg.appendChild(textureRect);
     }
 }
 
-// Function to add oil painting effect (simulating texture)
-function addOilPaintEffect() {
-    const svg = document.getElementById("svg");
-    const noiseCount = 100; // Number of oil paint dots
+// Execute the main draw functions on page load
+window.onload = function() {
+    drawSkyBackground();
+    drawBuilding();
+    drawBuilding1(); // Ensure the second building set is drawn
 
-    for (let i = 0; i < noiseCount; i++) {
-        const spot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        const cx = Math.random() * 850; // Random x position
-        const cy = Math.random() * 600; // Random y position
-        const r = randomRoundedValue(5) + 1; // Random radius, slightly larger
+    // Draw multiple waves
+    const wavePositions = [200, 300, 400, 530, 510, 470, 350, 360, 750, 770, 600];
+    const waveYPositions = [470, 488, 470, 470, 520, 550, 520, 550, 510, 550, 530];
 
-        const colorVariationR = Math.floor(Math.random() * 20 - 10); // Variation in color
-        const colorVariationG = Math.floor(Math.random() * 20 - 10);
-        const colorVariationB = Math.floor(Math.random() * 20 - 10);
-
-        const fillColor = `rgba(${Math.max(0, Math.min(255, 180 + colorVariationR))}, ${Math.max(0, Math.min(255, 180 + colorVariationG))}, ${Math.max(0, Math.min(255, 180 + colorVariationB))}, 0.7)`; // Base color with some variation
-
-        spot.setAttribute("cx", cx);
-        spot.setAttribute("cy", cy);
-        spot.setAttribute("r", r);
-        spot.setAttribute("fill", fillColor); // Oil paint effect color
-        svg.appendChild(spot);
+    for (let i = 0; i < wavePositions.length; i++) {
+        drawWaves(wavePositions[i], waveYPositions[i]);
     }
-}
+};
+
 
 // Function to draw the building structure
 function drawBuilding() {
@@ -128,11 +113,14 @@ function drawBuilding() {
 
         for (let i = 0; i < reflectionSegments; i++) {
             const segment = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+
+       
             segment.setAttribute("x", 100 + Math.sin(i * 1) * 5); 
             segment.setAttribute("y", initialY + i * segmentHeight);
             segment.setAttribute("width", "45");
             segment.setAttribute("height", segmentHeight);
             segment.setAttribute("fill", "rgba(44, 27, 50, 0.6)");
+
             svg.appendChild(segment);
         }
     }
@@ -142,19 +130,19 @@ function drawBuilding() {
 function drawBuilding1() {
     const svg = document.getElementById("svg");
 
-    // Building 1
+    // building1
     const building1 = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     building1.setAttribute("points", "650,300 720,160 750,300");
     building1.setAttribute("fill", "rgba(30, 30, 30, 0.15)");
     svg.appendChild(building1);
 
-    // Building 2
+    // building2
     const building2 = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     building2.setAttribute("points", "720,300 790,110 830,300");
     building2.setAttribute("fill", "rgba(30, 30, 30, 0.15)");
     svg.appendChild(building2);
 
-    // Building 3
+    // building3
     const building3 = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     building3.setAttribute("points", "480,300 630,270 750,300");
     building3.setAttribute("fill", "rgba(30, 30, 30, 0.15)");
@@ -190,3 +178,4 @@ window.onload = function() {
         drawWaves(wavePositions[i], waveYPositions[i]);
     }
 };
+

@@ -179,3 +179,47 @@ window.onload = function() {
     }
 };
 
+// Function to draw waves
+function drawWaves(startX, waveY) {
+    const svg = document.getElementById("svg");
+
+    // Draw a wave
+    const wave = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const cx = startX; // Set the horizontal center for a single wave
+    const cy = waveY; // Set the vertical center for a single wave
+    const rx = 40;
+    const ry = 10;
+    wave.setAttribute("d", `M${cx - rx},${cy} A${rx},${ry} 0 1,0 ${cx + rx},${cy}`);
+    wave.setAttribute("fill", "rgba(0, 105, 197, 0.3)");
+    svg.appendChild(wave);
+    // record wave
+    waveList.push({
+        wave,
+        cx, cy, rx, ry
+    })
+}
+
+// init p5js
+function setup() {
+    createCanvas(0, 0)
+}
+
+// Execute the main draw functions on page load
+window.onload = function () {
+    drawSkyBackground();
+    drawBuilding();
+    drawBuilding1(); // Ensure the second building set is drawn
+
+    // Draw multiple waves
+    const wavePositions = [200, 300, 400, 530, 510, 470, 350, 360, 750, 770, 600];
+    const waveYPositions = [470, 488, 470, 470, 520, 550, 520, 550, 510, 550, 530];
+
+    for (let i = 0; i < wavePositions.length; i++) {
+        drawWaves(wavePositions[i], waveYPositions[i]);
+    }
+
+    setInterval(() => {
+        updateSvg()
+    }, 20);
+};
+

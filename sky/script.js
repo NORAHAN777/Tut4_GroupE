@@ -78,7 +78,7 @@ function addTexture(baseRect, r, g, b, rectWidth, rectHeight, opacity) {
 }
 
 // Execute the main draw functions on page load
-window.onload = function() {
+window.onload = function () {
     drawSkyBackground();
     drawBuilding();
     drawBuilding1(); // Ensure the second building set is drawn
@@ -91,6 +91,28 @@ window.onload = function() {
         drawWaves(wavePositions[i], waveYPositions[i]);
     }
 };
+
+
+let segmentList = []
+let waveList = []
+let t = 0;
+
+function updateSvg() {
+    for (let i = 0; i < segmentList.length; i++) {
+        let x = segmentList[i].x;
+        let offsetX = noise(t + i * 0.1) * 100;
+        segmentList[i].segment.setAttribute("x", x + offsetX);
+    }
+    for (let i = 0; i < waveList.length; i++) {
+        let y = noise(t + i * 0.1) * 50;
+        let cx = waveList[i].cx
+        let cy = waveList[i].cy - 50 + y
+        let rx = waveList[i].rx
+        let ry = waveList[i].ry
+        waveList[i].wave.setAttribute("d", `M${cx - rx},${cy} A${rx},${ry} 0 1,0 ${cx + rx},${cy}`);
+    }
+    t += 0.01;
+}
 
 
 // Function to draw the building structure
@@ -107,21 +129,25 @@ function drawBuilding() {
     drawReflection();
 
     function drawReflection() {
-        const initialY = 300; 
-        const segmentHeight = 20; 
-        const reflectionSegments = 14; 
+        const initialY = 300;
+        const segmentHeight = 20;
+        const reflectionSegments = 14;
 
         for (let i = 0; i < reflectionSegments; i++) {
             const segment = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 
-       
-            segment.setAttribute("x", 100 + Math.sin(i * 1) * 5); 
+            segment.setAttribute("x", 100 + Math.sin(i * 1) * 5);
             segment.setAttribute("y", initialY + i * segmentHeight);
             segment.setAttribute("width", "45");
             segment.setAttribute("height", segmentHeight);
             segment.setAttribute("fill", "rgba(44, 27, 50, 0.6)");
 
             svg.appendChild(segment);
+            // record building
+            segmentList.push({
+                segment,
+                x: 100 + Math.sin(i * 1) * 5
+            })
         }
     }
 }
@@ -148,36 +174,6 @@ function drawBuilding1() {
     building3.setAttribute("fill", "rgba(30, 30, 30, 0.15)");
     svg.appendChild(building3);
 }
-
-// Function to draw waves
-function drawWaves(startX, waveY) {
-    const svg = document.getElementById("svg");
-
-    // Draw a wave
-    const wave = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    const cx = startX; // Set the horizontal center for a single wave
-    const cy = waveY; // Set the vertical center for a single wave
-    const rx = 40;
-    const ry = 10;
-    wave.setAttribute("d", `M${cx - rx},${cy} A${rx},${ry} 0 1,0 ${cx + rx},${cy}`);
-    wave.setAttribute("fill", "rgba(0, 105, 197, 0.3)");
-    svg.appendChild(wave);
-}
-
-// Execute the main draw functions on page load
-window.onload = function() {
-    drawSkyBackground();
-    drawBuilding();
-    drawBuilding1(); // Ensure the second building set is drawn
-
-    // Draw multiple waves
-    const wavePositions = [200, 300, 400, 530, 510, 470, 350, 360, 750, 770, 600];
-    const waveYPositions = [470, 488, 470, 470, 520, 550, 520, 550, 510, 550, 530];
-
-    for (let i = 0; i < wavePositions.length; i++) {
-        drawWaves(wavePositions[i], waveYPositions[i]);
-    }
-};
 
 // Function to draw waves
 function drawWaves(startX, waveY) {
@@ -222,4 +218,3 @@ window.onload = function () {
         updateSvg()
     }, 20);
 };
-
